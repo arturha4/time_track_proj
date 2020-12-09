@@ -7,3 +7,5 @@ class Test(StatesGroup):
     VK_END=State()
     VK_YES=State()
     VK_NO=State()
+    SET_SERVICE_WITHOUT_VK=State()
+    TAKE_URFU_LOGIN=State()

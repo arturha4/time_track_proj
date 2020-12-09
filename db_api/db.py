@@ -62,5 +62,3 @@ def get_user_info(tel_id):
     except:
         return ('Ошибка')
 
-
-show_users()
