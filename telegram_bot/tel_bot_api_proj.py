@@ -3,19 +3,25 @@ import asyncio
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-#from db_api import db
+from db_api import db
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import inline,tel_keyb_handlers
 from aiogram.types import InlineKeyboardButton
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
-token = '1260767500:AAFq0jjuZ6isvMj4OPn8yizFRDmR8yG4Glc'
+from telegram_bot.settings_cofiguration import token
+
 
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
+
+
+# async def(state:Test):
+#     if Test.SET_SERVICE:
+#         pass
 
 
 @dp.message_handler(commands=['start'], state=None)
@@ -51,10 +57,7 @@ async def verify_vk_auth(message: types.Message, state: FSMContext):
 
 #INLINE_BUTTONS_HANDLERS
 
-@dp.callback_query_handler(text_contains='vk',state=Test.SET_SERVICE)#сделать стейт чтобы много раз не выходило
-async def login_vk(call: types.CallbackQuery):
-    await bot.send_message(call.from_user.id, "Введи свой id vk или ник.")
-    await Test.TAKE_VK_ID.set()
+
 
 
 # нужно добавить обработчик состояния при сообщении проверять будет по стейту
@@ -63,17 +66,29 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
     await bot.send_message(call.from_user.id, "Отлично!")
     id=await state.get_data()
     x=id.get('vk_login')
+    #нужно в конце авторизации определить какую клаву крепить к юзеру
     await bot.send_message(chat_id=call.from_user.id, text='Какие оставшиеся сервисы ты хочешь использвать?',
                            reply_markup=inline.inline_git_urfu_kb)
     await Test.TAKE_URFU_LOGIN.set()
-   # db.create_user(call.from_user.id,x)
 
-@dp.callback_query_handler(text_contains='no', state=Test.VK_YES)
+@dp.callback_query_handler(text_contains='no', state=Test.SET_SERVICE)
 async def unsucces_auth_vk(call: types.CallbackQuery):
     await bot.send_message(call.from_user.id, 'Проверь ник ещё раз, если что-то не так введи данные ещё раз')
     await Test.TAKE_VK_ID.set()
 
-@dp.callback_query_handler(text_contains='urfu', state=Test.TAKE_URFU_LOGIN)
+
+@dp.callback_query_handler(text_contains='urfu', state=Test.SET_SERVICE)
+async def set_urfu(call:types.CallbackQuery,state=FSMContext):
+    await bot.send_message(chat_id=call.from_user.id,text='Введи свой логин от личного кабинета урфу')
+
+
+@dp.callback_query_handler(text_contains='vk',state=Test.SET_SERVICE)#сделать стейт чтобы много раз не выходило
+async def login_vk(call: types.CallbackQuery):
+    await bot.send_message(call.from_user.id, f"Введи свой id vk или ник.")
+    await Test.TAKE_VK_ID.set()
+
+
+dp.callback_query_handler(text_contains='github', state=Test.TAKE_URFU_LOGIN)
 async def set_urfu(call:types.CallbackQuery,state=FSMContext):
     await bot.send_message(chat_id=call.from_user.id,text='Введи свой логин от личного кабинета урфу')
 
