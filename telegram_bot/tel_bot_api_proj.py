@@ -1,36 +1,19 @@
-import aiogram
-import asyncio
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-#from db_api import db
+from db_api import db
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import inline
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
-from  telegram_bot.settings_config import token
+from telegram_bot.settings_cofiguration import token
+from keyboards.reply import keyb_next
+
 
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
-
-
-async def get_choosed_keyb(state:FSMContext):
-    log=await state.get_data()
-    vk,github,urfu=log.get('vk_selected'),log.get('github_selected'),log.get('urfu_login')
-    if vk==False and github==False and urfu==True:
-        return inline.inline_vk_github_kb
-    if vk==False and github==True and urfu==False:
-        return inline.inline_vk_urfu_kb
-    if vk==True and github==False and urfu==False:
-        return inline.inline_github_urfu
-    if vk == True and github == False and urfu == True:
-        return inline.inline_github_kb
-    if vk == True and github == True and urfu == False:
-        return inline.inline_urfu_kb
-    if vk == False and github == True and urfu == True:
-        return inline.inline_vk_urfu_kb
 
 
 @dp.message_handler(commands=['start'], state=None)
@@ -51,12 +34,6 @@ async def start_message(message: types.Message):
 async def auth(message: types.Message,state:FSMContext):
     await state.update_data(vk_selected=False,github_selected=False,urfu_selected=False)
     await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.inline_kb1)
-    await Test.SET_SERVICE.set()
-
-
-@dp.message_handler(Command('nextauth'), state=Test.DEFAULT)
-async def auth(message: types.Message,state:FSMContext):
-    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=await get_choosed_keyb(state))
     await Test.SET_SERVICE.set()
 
 
@@ -94,7 +71,7 @@ async def take_github_login(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['github_selected']=True
     await bot.send_message(message.chat.id, "Отлично")
-    await Test.DEFAULT.set()
+    await Test.SET_START_TIME.set()
 
 
 # нужно добавить обработчик состояния при сообщении проверять будет по стейту
@@ -106,7 +83,7 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
         data['vk_selected']=True
     #нужно в конце авторизации определить какую клаву крепить к юзеру
     await Test.DEFAULT.set()
-    await bot.send_message(call.from_user.id, "Отлично!",reply_markup=await get_choosed_keyb(state))
+    await bot.send_message(call.from_user.id, "Отлично!",reply_markup=keyb_next)
 
 
 
