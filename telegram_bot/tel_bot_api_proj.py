@@ -40,7 +40,7 @@ async def auth(message: types.Message,state:FSMContext):
 
 @dp.message_handler(Command('nextauth'), state=Test.DEFAULT)
 async def next_auth(message: types.Message,state:FSMContext):
-    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.get_choosed_keyboard(state))
+    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=await inline.get_choosed_keyboard(state))
     await Test.SET_SERVICE.set()
 
 

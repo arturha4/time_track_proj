@@ -23,7 +23,7 @@ inline_urfu_kb = InlineKeyboardMarkup().add(urfu_btn)
 
 async def get_choosed_keyboard(state: FSMContext):
     log = await state.get_data()
-    vk, github, urfu = await log.get('vk_selected'),await log.get('github_selected'),await log.get('urfu_selected')
+    vk, github, urfu = log.get('vk_selected'), log.get('github_selected'), log.get('urfu_selected')
     if vk == False and github == False and urfu == True:
         return inline_vk_github_kb
     if vk == False and github == True and urfu == False:
