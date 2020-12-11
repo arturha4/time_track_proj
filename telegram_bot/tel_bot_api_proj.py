@@ -1,7 +1,7 @@
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from db_api import db
+# db_api import db
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import inline
 from aiogram.dispatcher.filters import Command
@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
 
 
 @dp.message_handler(commands=['start'], state=None)
@@ -34,6 +35,12 @@ async def start_message(message: types.Message):
 async def auth(message: types.Message,state:FSMContext):
     await state.update_data(vk_selected=False,github_selected=False,urfu_selected=False)
     await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.inline_kb1)
+    await Test.SET_SERVICE.set()
+
+
+@dp.message_handler(Command('nextauth'), state=Test.DEFAULT)
+async def auth(message: types.Message,state:FSMContext):
+    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.get_choosed_keyboard(state))
     await Test.SET_SERVICE.set()
 
 
@@ -63,15 +70,17 @@ async def take_urfu_password(message:types.Message,state:FSMContext):
     async with state.proxy() as data:
         data['urfu_selected']=True
     await Test.DEFAULT.set()
-
+    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextauth\n"
+                                              "для регистрации в следуещем сервисе")
 
 @dp.message_handler(state=Test.TAKE_GITHUB_LOGIN)
 async def take_github_login(message: types.Message, state: FSMContext):
     await state.update_data(github_login=message.text)
     async with state.proxy() as data:
         data['github_selected']=True
-    await bot.send_message(message.chat.id, "Отлично")
-    await Test.SET_START_TIME.set()
+    await bot.send_message(message.chat.id,  "Отлично! Отправь команду /nextauth\n"
+                                              "для регистрации в следуещем сервисе")
+    await Test.DEFAULT.set()
 
 
 # нужно добавить обработчик состояния при сообщении проверять будет по стейту
@@ -83,7 +92,8 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
         data['vk_selected']=True
     #нужно в конце авторизации определить какую клаву крепить к юзеру
     await Test.DEFAULT.set()
-    await bot.send_message(call.from_user.id, "Отлично!",reply_markup=keyb_next)
+    await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextauth\n"
+                                              "для регистрации в следуещем сервисе")
 
 
 
