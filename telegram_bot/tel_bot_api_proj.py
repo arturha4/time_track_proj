@@ -97,7 +97,7 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
 
 
 
-@dp.callback_query_handler(text_contains='no', state=Test.SET_SERVICE)
+@dp.callback_query_handler(text_contains='no', state=Test.VK_YES)
 async def unsucces_auth_vk(call: types.CallbackQuery):
     await bot.send_message(call.from_user.id, 'Проверь ник ещё раз, если что-то не так введи данные ещё раз')
     await Test.TAKE_VK_ID.set()
