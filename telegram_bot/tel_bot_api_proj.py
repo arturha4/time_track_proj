@@ -39,7 +39,7 @@ async def auth(message: types.Message,state:FSMContext):
 
 
 @dp.message_handler(Command('nextauth'), state=Test.DEFAULT)
-async def auth(message: types.Message,state:FSMContext):
+async def next_auth(message: types.Message,state:FSMContext):
     await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.get_choosed_keyboard(state))
     await Test.SET_SERVICE.set()
 
@@ -64,14 +64,14 @@ async def take_urfu_login(message:types.Message,state:FSMContext):
     await Test.TAKE_URFU_PASSWORD.set()
 
 
-@dp.message_handler(state=Test.TAKE_URFU_LOGIN)
+@dp.message_handler(state=Test.TAKE_URFU_PASSWORD)
 async def take_urfu_password(message:types.Message,state:FSMContext):
     await state.update_data(urfu_password=message.text)
     async with state.proxy() as data:
         data['urfu_selected']=True
-    await Test.DEFAULT.set()
     await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextauth\n"
                                               "для регистрации в следуещем сервисе")
+    await Test.DEFAULT.set()
 
 @dp.message_handler(state=Test.TAKE_GITHUB_LOGIN)
 async def take_github_login(message: types.Message, state: FSMContext):
