@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from aiogram.dispatcher import FSMContext
 
 vk_btn = InlineKeyboardButton('ВК', callback_data='vk')
@@ -21,6 +21,15 @@ inline_vk_kb = InlineKeyboardMarkup().add(vk_btn)
 inline_urfu_kb = InlineKeyboardMarkup().add(urfu_btn)
 
 
+time_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+
+for i in range(0, 24):
+    hour = f'0{i}' if i < 10 else i
+    time_kb.insert(f'{hour}:00')
+    for j in range(15, 46, 15):
+        time_kb.insert(f'{hour}:{j}')
+
+
 async def get_choosed_keyboard(state: FSMContext):
     log = await state.get_data()
     vk, github, urfu = log.get('vk_selected'), log.get('github_selected'), log.get('urfu_selected')
@@ -35,6 +44,8 @@ async def get_choosed_keyboard(state: FSMContext):
     if vk == True and github ==True and urfu == False:
         return inline_urfu_kb
     if vk == False and github == True and urfu == True:
+        return inline_vk_urfu_kb
+    if vk == True and github == True and urfu == True:
         return inline_vk_urfu_kb
 
 

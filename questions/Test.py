@@ -12,4 +12,5 @@ class Test(StatesGroup):
     TAKE_GITHUB_LOGIN=State()
     DEFAULT=State()
     SET_START_TIME=State()
-    SET_END_TIME=State
+    SET_END_TIME=State()
+    REGISTERED=State()

@@ -38,9 +38,9 @@ async def auth(message: types.Message,state:FSMContext):
     await Test.SET_SERVICE.set()
 
 
-@dp.message_handler(Command('nextauth'), state=Test.DEFAULT)
+@dp.message_handler(Command('nextstep'), state=Test.DEFAULT)
 async def next_auth(message: types.Message,state:FSMContext):
-    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=await inline.get_choosed_keyboard(state))
+    await message.answer('Введи /nextstep', reply_markup=await inline.get_choosed_keyboard(state))
     await Test.SET_SERVICE.set()
 
 
@@ -69,8 +69,10 @@ async def take_urfu_password(message:types.Message,state:FSMContext):
     await state.update_data(urfu_password=message.text)
     async with state.proxy() as data:
         data['urfu_selected']=True
-    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextauth\n"
-                                              "для регистрации в следуещем сервисе")
+    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextstep\n"
+                                              "для регистрации в следуещем сервисе\n"
+                                              "или /selecttime для перехода к выбору\n"
+                                              "времени")
     await Test.DEFAULT.set()
 
 @dp.message_handler(state=Test.TAKE_GITHUB_LOGIN)
@@ -78,9 +80,35 @@ async def take_github_login(message: types.Message, state: FSMContext):
     await state.update_data(github_login=message.text)
     async with state.proxy() as data:
         data['github_selected']=True
-    await bot.send_message(message.chat.id,  "Отлично! Отправь команду /nextauth\n"
-                                              "для регистрации в следуещем сервисе")
+    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextstep\n"
+                                              "для регистрации в следуещем сервисе\n"
+                                              "или /selecttime для перехода к выбору\n"
+                                              "времени")
     await Test.DEFAULT.set()
+
+
+#TIMEHANDLERS
+@dp.message_handler(Command('selecttime'), state=Test.DEFAULT)
+async def auth(message: types.Message,state:FSMContext):
+    await Test.SET_START_TIME.set()
+    await message.answer("Выбери начало трекинга!", reply_markup=inline.time_kb)
+
+
+@dp.message_handler(state=Test.SET_START_TIME)
+async def auth(message: types.Message,state:FSMContext):
+    await message.answer("Теперь выбери конец трекинга!", reply_markup=inline.time_kb)
+    async with state.proxy() as data:
+        data['start_time']=message.text
+    await Test.SET_END_TIME.set()
+
+
+@dp.message_handler(state=Test.SET_END_TIME)
+async def auth(message: types.Message,state:FSMContext):
+    await message.answer("Отлично теперь мы можем\n"
+                         "отслеживать твою активность")
+    async with state.proxy() as data:
+        data['end_time']=message.text
+    await Test.REGISTERED.set()
 
 
 # нужно добавить обработчик состояния при сообщении проверять будет по стейту
@@ -92,8 +120,10 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
         data['vk_selected']=True
     #нужно в конце авторизации определить какую клаву крепить к юзеру
     await Test.DEFAULT.set()
-    await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextauth\n"
-                                              "для регистрации в следуещем сервисе")
+    await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                              "для регистрации в следуещем сервисе\n"
+                                              "или /selecttime для перехода к выбору\n"
+                                              "времени")
 
 
 
