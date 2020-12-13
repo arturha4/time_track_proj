@@ -45,8 +45,12 @@ async def get_choosed_keyboard(state: FSMContext):
         return inline_urfu_kb
     if vk == False and github == True and urfu == True:
         return inline_vk_urfu_kb
-    if vk == True and github == True and urfu == True:
-        return inline_vk_urfu_kb
 
 
-
+async def check_need_keyboard(state: FSMContext):
+    log = await state.get_data()
+    vk, github, urfu = log.get('vk_selected'), log.get('github_selected'), log.get('urfu_selected')
+    if vk == False and github == False and urfu == False:
+        return True
+    else:
+        False

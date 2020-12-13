@@ -69,10 +69,14 @@ async def take_urfu_password(message:types.Message,state:FSMContext):
     await state.update_data(urfu_password=message.text)
     async with state.proxy() as data:
         data['urfu_selected']=True
-    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextstep\n"
-                                              "для регистрации в следуещем сервисе\n"
-                                              "или /selecttime для перехода к выбору\n"
-                                              "времени")
+    if await inline.check_need_keyboard(state) == False:
+        await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
+                                                     "для перехода к выбору времени ")
+    else:
+        await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                                     "для регистрации в следуещем сервисе\n"
+                                                     "или /selecttime для перехода к выбору\n"
+                                                     "времени")
     await Test.DEFAULT.set()
 
 @dp.message_handler(state=Test.TAKE_GITHUB_LOGIN)
@@ -80,10 +84,14 @@ async def take_github_login(message: types.Message, state: FSMContext):
     await state.update_data(github_login=message.text)
     async with state.proxy() as data:
         data['github_selected']=True
-    await bot.send_message(message.chat.id, "Отлично! Отправь команду /nextstep\n"
-                                              "для регистрации в следуещем сервисе\n"
-                                              "или /selecttime для перехода к выбору\n"
-                                              "времени")
+    if await inline.check_need_keyboard(state) == False:
+        await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
+                                                  "для перехода к выбору времени ")
+    else:
+        await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                                  "для регистрации в следуещем сервисе\n"
+                                                  "или /selecttime для перехода к выбору\n"
+                                                  "времени")
     await Test.DEFAULT.set()
 
 
@@ -108,6 +116,17 @@ async def auth(message: types.Message,state:FSMContext):
                          "отслеживать твою активность")
     async with state.proxy() as data:
         data['end_time']=message.text
+    all_data=await state.get_data()
+    await message.answer(f"""
+Твой логин вк:{all_data.get("vk_login")}
+Твой логин урфу:{all_data.get("urfu_login")}
+Твой логин гитхаб:{all_data.get("github_login")}
+Время старта:{all_data.get("start_time")}
+Время окончания:{all_data.get("end_time")}
+                         """)
+
+
+
     await Test.REGISTERED.set()
 
 
@@ -120,7 +139,11 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
         data['vk_selected']=True
     #нужно в конце авторизации определить какую клаву крепить к юзеру
     await Test.DEFAULT.set()
-    await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
+    if await inline.check_need_keyboard(state)==False:
+        await bot.send_message(call.from_user.id,"Отправь команду /selecttime \n"
+                                                 "для перехода к выбору времени ")
+    else:
+        await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
                                               "для регистрации в следуещем сервисе\n"
                                               "или /selecttime для перехода к выбору\n"
                                               "времени")
