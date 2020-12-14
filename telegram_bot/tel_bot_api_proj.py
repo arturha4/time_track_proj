@@ -40,7 +40,7 @@ async def auth(message: types.Message,state:FSMContext):
 
 @dp.message_handler(Command('nextstep'), state=Test.DEFAULT)
 async def next_auth(message: types.Message,state:FSMContext):
-    await message.answer('Введи /nextstep', reply_markup=await inline.get_choosed_keyboard(state))
+    await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
     await Test.SET_SERVICE.set()
 
 
@@ -48,10 +48,8 @@ async def next_auth(message: types.Message,state:FSMContext):
 @dp.message_handler(state=Test.TAKE_VK_ID)
 async def verify_vk_auth(message: types.Message, state: FSMContext):
     await state.update_data(vk_login=message.text)
-    await message.answer(text=f'https://vk.com/{message.text}', reply_markup=inline.inline_vk_yes_no_kb)
-    log=await state.get_data()
-    l=log.get('vk_login')
-    await message.answer(text=l)
+    await message.answer(text=f'Твоя страница?\n'
+                              f'https://vk.com/{message.text}', reply_markup=inline.inline_vk_yes_no_kb)
     await Test.VK_YES.set()
 
 
@@ -66,25 +64,25 @@ async def take_urfu_login(message:types.Message,state:FSMContext):
 
 @dp.message_handler(state=Test.TAKE_URFU_PASSWORD)
 async def take_urfu_password(message:types.Message,state:FSMContext):
-    await state.update_data(urfu_password=message.text)
     async with state.proxy() as data:
         data['urfu_selected']=True
-    if await inline.check_need_keyboard(state) == False:
+    await state.update_data(urfu_password=message.text)
+    if await inline.check_need_keyboard(state):
         await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
-                                                     "для перехода к выбору времени ")
+                                                  "для перехода к выбору времени ")
     else:
         await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
-                                                     "для регистрации в следуещем сервисе\n"
-                                                     "или /selecttime для перехода к выбору\n"
-                                                     "времени")
+                                                  "для регистрации в следуещем сервисе\n"
+                                                  "или /selecttime для перехода к выбору\n"
+                                                  "времени")
     await Test.DEFAULT.set()
 
 @dp.message_handler(state=Test.TAKE_GITHUB_LOGIN)
 async def take_github_login(message: types.Message, state: FSMContext):
-    await state.update_data(github_login=message.text)
     async with state.proxy() as data:
         data['github_selected']=True
-    if await inline.check_need_keyboard(state) == False:
+    await state.update_data(github_login=message.text)
+    if await inline.check_need_keyboard(state):
         await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
                                                   "для перехода к выбору времени ")
     else:
@@ -133,21 +131,20 @@ async def auth(message: types.Message,state:FSMContext):
 # нужно добавить обработчик состояния при сообщении проверять будет по стейту
 @dp.callback_query_handler(text_contains='yes', state=Test.VK_YES)
 async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
-    id=await state.get_data()
-    x=id.get('vk_login')
     async with state.proxy() as data:
         data['vk_selected']=True
+    id=await state.get_data()
+    x=id.get('vk_login')
     #нужно в конце авторизации определить какую клаву крепить к юзеру
-    await Test.DEFAULT.set()
-    if await inline.check_need_keyboard(state)==False:
-        await bot.send_message(call.from_user.id,"Отправь команду /selecttime \n"
-                                                 "для перехода к выбору времени ")
+    if await inline.check_need_keyboard(state):
+        await bot.send_message(call.from_user.id, "Отправь команду /selecttime \n"
+                                                  "для перехода к выбору времени ")
     else:
         await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
-                                              "для регистрации в следуещем сервисе\n"
-                                              "или /selecttime для перехода к выбору\n"
-                                              "времени")
-
+                                                  "для регистрации в следуещем сервисе\n"
+                                                  "или /selecttime для перехода к выбору\n"
+                                                  "времени")
+    await Test.DEFAULT.set()
 
 
 @dp.callback_query_handler(text_contains='no', state=Test.VK_YES)

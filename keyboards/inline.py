@@ -50,7 +50,7 @@ async def get_choosed_keyboard(state: FSMContext):
 async def check_need_keyboard(state: FSMContext):
     log = await state.get_data()
     vk, github, urfu = log.get('vk_selected'), log.get('github_selected'), log.get('urfu_selected')
-    if vk == False and github == False and urfu == False:
-        return True
-    else:
+    if vk == True and github == True and urfu == True:
         False
+    else:
+        True

@@ -10,7 +10,7 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 
 
-#cursor.execute("CREATE DATABASE ApiProject") создал бд
+#cursor.execute("CREATE DATABASE ApiProject")
 #cursor.execute("CREATE TABLE User (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,start_time VARCHAR(5),end_time VARCHAR(5))") #создал table
 
 
@@ -62,3 +62,4 @@ def get_user_info(tel_id):
     except:
         return ('Ошибка')
 
+show_users()
