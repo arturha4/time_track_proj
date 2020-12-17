@@ -7,7 +7,6 @@ from keyboards import inline
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
 from telegram_bot.settings_cofiguration import token
-from keyboards.reply import keyb_next
 
 
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +25,11 @@ async def start_message(message: types.Message):
 
 
 @dp.message_handler(commands=['help'])
-async def start_message(message: types.Message):
+async def help_message(message: types.Message):
     await message.answer(
-        "Список команд:\n/auth - авторизация в сервисах \n/starttime - назначить/изменить время начала трекинга\n/endtime - назначить/изменить время конца трекинга")
+        "Список команд:\n/auth - авторизация в сервисах \n"
+        "/starttime - назначить/изменить время начала трекинга\n"
+        "/endtime - назначить/изменить время конца трекинга")
 
 
 @dp.message_handler(Command('auth'), state=Test.DEFAULT)
@@ -40,8 +41,15 @@ async def auth(message: types.Message,state:FSMContext):
 
 @dp.message_handler(Command('nextstep'), state=Test.DEFAULT)
 async def next_auth(message: types.Message,state:FSMContext):
-    await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
-    await Test.SET_SERVICE.set()
+    if await inline.get_choosed_keyboard(state) is None:
+        #await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
+        #await Test.SET_SERVICE.set()
+        await  message.answer('Сервисы закончились, нажми /selecttime\n'
+                              'и ты перейдёшь к выбору времени')
+        await Test.SET_START_TIME.set()
+    else:
+        await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
+        await Test.SET_SERVICE.set()
 
 
 #VK MESSAGE HANDLERS
@@ -67,12 +75,8 @@ async def take_urfu_password(message:types.Message,state:FSMContext):
     async with state.proxy() as data:
         data['urfu_selected']=True
     await state.update_data(urfu_password=message.text)
-    if await inline.check_need_keyboard(state):
-        await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
-                                                  "для перехода к выбору времени ")
-    else:
-        await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
-                                                  "для регистрации в следуещем сервисе\n"
+    await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                                  "для регистрации в следующем сервисе\n"
                                                   "или /selecttime для перехода к выбору\n"
                                                   "времени")
     await Test.DEFAULT.set()
@@ -82,26 +86,22 @@ async def take_github_login(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['github_selected']=True
     await state.update_data(github_login=message.text)
-    if await inline.check_need_keyboard(state):
-        await bot.send_message(message.from_user.id, "Отправь команду /selecttime \n"
-                                                  "для перехода к выбору времени ")
-    else:
-        await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
-                                                  "для регистрации в следуещем сервисе\n"
-                                                  "или /selecttime для перехода к выбору\n"
-                                                  "времени")
+    await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                                 "для регистрации в следующем сервисе\n"
+                                                 "или /selecttime для перехода к выбору\n"
+                                                 "времени")
     await Test.DEFAULT.set()
 
 
 #TIMEHANDLERS
 @dp.message_handler(Command('selecttime'), state=Test.DEFAULT)
-async def auth(message: types.Message,state:FSMContext):
+async def select_track_time(message: types.Message,state:FSMContext):
     await Test.SET_START_TIME.set()
     await message.answer("Выбери начало трекинга!", reply_markup=inline.time_kb)
 
 
 @dp.message_handler(state=Test.SET_START_TIME)
-async def auth(message: types.Message,state:FSMContext):
+async def select_start_track_time(message: types.Message,state:FSMContext):
     await message.answer("Теперь выбери конец трекинга!", reply_markup=inline.time_kb)
     async with state.proxy() as data:
         data['start_time']=message.text
@@ -109,7 +109,7 @@ async def auth(message: types.Message,state:FSMContext):
 
 
 @dp.message_handler(state=Test.SET_END_TIME)
-async def auth(message: types.Message,state:FSMContext):
+async def reg_end(message: types.Message,state:FSMContext):
     await message.answer("Отлично теперь мы можем\n"
                          "отслеживать твою активность")
     async with state.proxy() as data:
@@ -136,14 +136,10 @@ async def success_auth_vk(call: types.CallbackQuery, state:FSMContext):
     id=await state.get_data()
     x=id.get('vk_login')
     #нужно в конце авторизации определить какую клаву крепить к юзеру
-    if await inline.check_need_keyboard(state):
-        await bot.send_message(call.from_user.id, "Отправь команду /selecttime \n"
-                                                  "для перехода к выбору времени ")
-    else:
-        await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
-                                                  "для регистрации в следуещем сервисе\n"
-                                                  "или /selecttime для перехода к выбору\n"
-                                                  "времени")
+    await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
+                                                 "для регистрации в следующем сервисе\n"
+                                                 "или /selecttime для перехода к выбору\n"
+                                                 "времени")
     await Test.DEFAULT.set()
 
 
