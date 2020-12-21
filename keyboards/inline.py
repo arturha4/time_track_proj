@@ -33,17 +33,17 @@ for i in range(0, 24):
 async def get_choosed_keyboard(state: FSMContext):
     log = await state.get_data()
     vk, github, urfu = log.get('vk_selected'), log.get('github_selected'), log.get('urfu_selected')
-    if vk == False and github == False and urfu == True:
+    if not vk and not github and urfu:
         return inline_vk_github_kb
-    if vk == False and github == True and urfu == False:
+    if not vk and github and not urfu:
         return inline_vk_urfu_kb
-    if vk == True and github == False and urfu == False:
+    if vk and not github and not urfu:
         return inline_github_urfu
-    if vk == True and github == False and urfu == True:
+    if vk and not github and urfu:
         return inline_github_kb
-    if vk == True and github ==True and urfu == False:
+    if vk and github and not urfu:
         return inline_urfu_kb
-    if vk == False and github == True and urfu == True:
-        return inline_vk_urfu_kb
+    if not vk and github and urfu:
+        return inline_vk_kb
     else:
         return None
