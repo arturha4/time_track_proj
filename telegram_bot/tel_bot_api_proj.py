@@ -46,7 +46,7 @@ async def next_auth(message: types.Message,state:FSMContext):
         #await Test.SET_SERVICE.set()
         await  message.answer('Сервисы закончились, нажми /selecttime\n'
                               'и ты перейдёшь к выбору времени')
-        await Test.SET_START_TIME.set()
+        await Test.DEFAULT.set()
     else:
         await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
         await Test.SET_SERVICE.set()
