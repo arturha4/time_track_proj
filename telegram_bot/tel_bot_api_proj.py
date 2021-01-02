@@ -1,7 +1,7 @@
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-# db_api import db
+from db_api import db
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import inline
 from aiogram.dispatcher.filters import Command
@@ -76,7 +76,7 @@ async def take_urfu_password(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['urfu_selected'] = False
         await bot.send_message(chat_id=message.from_user.id, reply_markup=await inline.get_choosed_keyboard(state),
-                               text='Неправельно введен логин или пароль, попробуйте еще раз')
+                               text='Неправильно введен логин или пароль, попробуйте еще раз')
         await Test.SET_SERVICE.set()
     else:
         async with state.proxy() as data:
@@ -122,12 +122,13 @@ async def reg_end(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['end_time'] = message.text
     all_data = await state.get_data()
+    await db.parse_user_state_data(all_data.items())
     await message.answer(f"""
-Твой логин вк:{all_data.get("vk_login")}
-Твой логин урфу:{all_data.get("urfu_login")}
-Твой логин гитхаб:{all_data.get("github_login")}
-Время старта:{all_data.get("start_time")}
-Время окончания:{all_data.get("end_time")}
+Твой логин вк: {all_data.get("vk_login")}
+Твой логин урфу: {all_data.get("urfu_login")}
+Твой логин гитхаб: {all_data.get("github_login")}
+Время старта: {all_data.get("start_time")}
+Время окончания: {all_data.get("end_time")}
                          """)
 
     await Test.REGISTERED.set()
