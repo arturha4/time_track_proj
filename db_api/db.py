@@ -11,8 +11,7 @@ cursor = db.cursor()
 
 
 #cursor.execute("CREATE DATABASE ApiProject")
-#cursor.execute("CREATE TABLE tlg_bot_user (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,"
-#"start_time VARCHAR(5),end_time VARCHAR(5), urfu_login VARCHAR (40),urfu_password VARCHAR(30), github_login VARCHAR(39))")
+#cursor.execute("CREATE TABLE tlg_bot_user (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,start_time VARCHAR(5),end_time VARCHAR(5), urfu_login VARCHAR (40),urfu_password VARCHAR(30), github_login VARCHAR(39))")
 '''
 ('vk_selected', True) ('github_selected', True) 
 ('urfu_selected', True) ('vk_login', 'asd') 
@@ -40,10 +39,15 @@ def show_tables():
         print(x)
 
 def create_user(data,tlg_chat_id):
-    cursor.execute(f"INSERT INTO tlg_bot_user VALUES {tlg_chat_id},{data[3][1]},{0},{data[7][1]},{data[8][1]},{data[4][1]},{data[5][1]},{data[6][1]}")
-    #распарсить здесь нужно
-    values=(tlg_chat_id,data[3][1],0,data[7][1],data[8][1],data[4][1],data[5][1],data[6][1])
-    db.commit()
+    try:
+        sql='INSERT INTO tlg_bot_user (telegram_id,vk_id,time_in_vk,start_time,end_time,urfu_login,urfu_password,github_login) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
+        values=(tlg_chat_id,data[3][1],0,data[6][1],data[7][1],data[4][1],data[5][1],data[6][1])
+        cursor.execute(sql,values)
+        db.commit()
+    except:
+      print('error')
+    finally:
+       print(*data)
 
 # def create_user(tel_id,vk_id,time_in_vk=0):
 #     sql='INSERT INTO tlg_bot_user (telegram_id, time_in_vk, vk_id) VALUES(%s,%s,%s)'
@@ -60,7 +64,7 @@ def show_users():
 
 
 def delete_all_users():
-    cursor.execute('DELETE FROM user')
+    cursor.execute('DELETE FROM tlg_bot_user')
     db.commit()
 
 def show_colummns():
@@ -81,5 +85,3 @@ def get_user_info(tel_id):
     except:
         return ('Ошибка')
 
-
-show_colummns()

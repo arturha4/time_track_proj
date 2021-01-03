@@ -122,7 +122,7 @@ async def reg_end(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['end_time'] = message.text
     all_data = await state.get_data()
-    await db.parse_user_state_data(all_data.items())
+    db.create_user(all_data.items(),message.chat.id)
     await message.answer(f"""
 Твой логин вк: {all_data.get("vk_login")}
 Твой логин урфу: {all_data.get("urfu_login")}
@@ -141,7 +141,6 @@ async def success_auth_vk(call: types.CallbackQuery, state: FSMContext):
         data['vk_selected'] = True
     id = await state.get_data()
     x = id.get('vk_login')
-    # нужно в конце авторизации определить какую клаву крепить к юзеру
     await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
                                               "для регистрации в следующем сервисе\n"
                                               "или /selecttime для перехода к выбору\n"
