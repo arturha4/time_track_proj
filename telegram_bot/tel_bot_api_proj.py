@@ -17,11 +17,14 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 @dp.message_handler(commands=['start'], state=None)
 async def start_message(message: types.Message, state=FSMContext):
-    await state.update_data(vk_selected=False, github_selected=False, urfu_selected=False)
-    await message.answer("Привет, я бот для учета времени, я помогу тебе отслеживать твою активность "
+    if await db.get_user_info(message.chat.id)==None:
+        await state.update_data(vk_selected=False, github_selected=False, urfu_selected=False)
+        await message.answer("Привет, я бот для учета времени, я помогу тебе отслеживать твою активность "
                          "в социальных сетях и не только!\n"
                          "Давай начнём, введи /auth для регистрации")
-    await Test.DEFAULT.set()
+        await Test.DEFAULT.set()
+    else:
+        await message.answer('Вы уже зарегистриованы')
 
 
 @dp.message_handler(commands=['help'])
@@ -133,7 +136,6 @@ async def reg_end(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['end_time'] = message.text
     all_data = await state.get_data()
-    print(all_data)
     await add_info_to_dict(all_data)
     await message.answer(f"""
     Твой логин вк: {all_data.get("vk_login")}
