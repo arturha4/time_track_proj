@@ -92,7 +92,7 @@ async def take_urfu_password(message: types.Message, state: FSMContext):
 async def take_github_login(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['github_selected'] = True
-    await state.update_data(github_login=message.text)
+        data['github_login'] = message.text
     await bot.send_message(message.from_user.id, "Отлично! Отправь команду /nextstep\n"
                                                  "для регистрации в следующем сервисе\n"
                                                  "или /selecttime для перехода к выбору\n"
@@ -115,22 +115,34 @@ async def select_start_track_time(message: types.Message, state: FSMContext):
     await Test.SET_END_TIME.set()
 
 
+async def add_info_to_dict(data:FSMContext.get_data):
+    if not data['vk_selected']:
+        data['vk_login']='0'
+    if not data['urfu_selected']:
+        data['urfu_login']='0'
+        data['urfu_password']='0'
+    if not data['github_selected']:
+        data['github_login']='0'
+
+
 @dp.message_handler(state=Test.SET_END_TIME)
 async def reg_end(message: types.Message, state: FSMContext):
     await message.answer("Отлично теперь мы можем\n"
                          "отслеживать твою активность")
+    data=await state.get_data()
     async with state.proxy() as data:
         data['end_time'] = message.text
     all_data = await state.get_data()
-    await db.parse_user_state_data(all_data.items())
+    print(all_data)
+    await add_info_to_dict(all_data)
     await message.answer(f"""
-Твой логин вк: {all_data.get("vk_login")}
-Твой логин урфу: {all_data.get("urfu_login")}
-Твой логин гитхаб: {all_data.get("github_login")}
-Время старта: {all_data.get("start_time")}
-Время окончания: {all_data.get("end_time")}
-                         """)
-
+    Твой логин вк: {all_data.get("vk_login")}
+    Твой логин урфу: {all_data.get("urfu_login")}
+    Твой логин гитхаб: {all_data.get("github_login")}
+    Время старта: {all_data.get("start_time")}
+    Время окончания: {all_data.get("end_time")}
+                             """)
+    db.create_user(all_data, message.chat.id)
     await Test.REGISTERED.set()
 
 
@@ -139,9 +151,6 @@ async def reg_end(message: types.Message, state: FSMContext):
 async def success_auth_vk(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['vk_selected'] = True
-    id = await state.get_data()
-    x = id.get('vk_login')
-    # нужно в конце авторизации определить какую клаву крепить к юзеру
     await bot.send_message(call.from_user.id, "Отлично! Отправь команду /nextstep\n"
                                               "для регистрации в следующем сервисе\n"
                                               "или /selecttime для перехода к выбору\n"

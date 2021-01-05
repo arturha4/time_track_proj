@@ -40,16 +40,14 @@ def show_tables():
         print(x)
 
 def create_user(data,tlg_chat_id):
-    cursor.execute(f"INSERT INTO tlg_bot_user VALUES {tlg_chat_id},{data[3][1]},{0},{data[7][1]},{data[8][1]},{data[4][1]},{data[5][1]},{data[6][1]}")
-    #распарсить здесь нужно
-    values=(tlg_chat_id,data[3][1],0,data[7][1],data[8][1],data[4][1],data[5][1],data[6][1])
-    db.commit()
-
-# def create_user(tel_id,vk_id,time_in_vk=0):
-#     sql='INSERT INTO tlg_bot_user (telegram_id, time_in_vk, vk_id) VALUES(%s,%s,%s)'
-#     values=(tel_id,time_in_vk,vk_id)
-#     cursor.execute(sql,values)
-#     db.commit()
+    try:
+        sql = 'INSERT INTO tlg_bot_user (telegram_id,vk_id,time_in_vk,start_time,end_time,urfu_login,urfu_password,github_login) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
+    except mysql.connector.errors.IntegrityError:
+        print('This user is already registered')
+    finally:
+        values = (tlg_chat_id, data['vk_login'], 0, data['start_time'], data['end_time'], data['urfu_login'], data['urfu_password'], data['github_login'])
+        cursor.execute(sql, values)
+        db.commit()
 
 
 def show_users():
@@ -60,7 +58,7 @@ def show_users():
 
 
 def delete_all_users():
-    cursor.execute('DELETE FROM user')
+    cursor.execute('DELETE FROM tlg_bot_user')
     db.commit()
 
 def show_colummns():
@@ -75,11 +73,10 @@ def update_track_time(tel_id):
 #обработать исключение при одинаковом id
 def get_user_info(tel_id):
     try:
-        cursor.execute('SELECT * FROM User WHERE telegram_id={}'.format(tel_id))
+        cursor.execute('SELECT * FROM tlg_bot_user WHERE telegram_id={}'.format(tel_id))
         row = cursor.fetchone()
         return row
     except:
         return ('Ошибка')
 
-
-show_colummns()
+show_users()
