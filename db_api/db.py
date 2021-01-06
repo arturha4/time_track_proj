@@ -14,11 +14,10 @@ cursor = db.cursor()
 #cursor.execute("CREATE TABLE tlg_bot_user (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,"
 #"start_time VARCHAR(5),end_time VARCHAR(5), urfu_login VARCHAR (40),urfu_password VARCHAR(30), github_login VARCHAR(39))")
 
-l=[('vk_selected', True),('github_selected', True),
-('urfu_selected', True), ('vk_login', 'asd') ,
-('urfu_login', 'sadbooys.2001@gmail.com'), ('urfu_password', 'Arturka_2001'),
-('github_login', 'sfgfd'),
-('start_time', '10:45'), ('end_time', '22:30')]
+l={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'asd',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
 
 
 def show_databases():
@@ -39,8 +38,8 @@ def create_user(data,tlg_chat_id):
                   data['urfu_password'], data['github_login'])
         cursor.execute(sql, values)
         db.commit()
-    except:
-        return ("Ошибка")
+    except Exception as e:
+        return (f"Ошибка{e}")
 
 
 
@@ -63,11 +62,15 @@ def show_colummns():
         print(x)
 
 
-def update_track_time(tel_id):
-    pass
-#обновлять данные по телеграм айди т.к. он индивидуальный
-#обработать исключение при одинаковом id
-def get_user_info(tel_id):
+def get_users_tel_id():
+    cursor.execute('SELECT telegram_id FROM tlg_bot_user')
+    for i in cursor.fetchall():
+        yield i[0]
+
+
+
+
+async def get_user_info(tel_id):
     try:
         cursor.execute('SELECT * FROM tlg_bot_user WHERE telegram_id={}'.format(tel_id))
         row = cursor.fetchone()
@@ -78,9 +81,6 @@ def get_user_info(tel_id):
         }
         return d
     except:
-        return ('Ошибка')
+        return None
 
-
-
-l=get_user_info(766109265)
-print(l)
+show_users()
