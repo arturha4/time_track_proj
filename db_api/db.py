@@ -67,12 +67,20 @@ def update_track_time(tel_id):
     pass
 #обновлять данные по телеграм айди т.к. он индивидуальный
 #обработать исключение при одинаковом id
-async def get_user_info(tel_id):
+def get_user_info(tel_id):
     try:
         cursor.execute('SELECT * FROM tlg_bot_user WHERE telegram_id={}'.format(tel_id))
         row = cursor.fetchone()
-        return row
+        d={
+            'telegram_id':row[0],
+            'start_time':row[3],
+            'end_time': row[4],
+        }
+        return d
     except:
         return ('Ошибка')
 
-show_users()
+
+
+l=get_user_info(766109265)
+print(l)
