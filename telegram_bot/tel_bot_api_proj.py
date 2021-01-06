@@ -191,7 +191,7 @@ async def periodic(sleep_for):
     while True:
         await asyncio.sleep(sleep_for)
         now = datetime.utcnow()
-        await bot.send_message('766109265', 'test', disable_notification=True)
+        await bot.send_message('766109265', f'test:{now}', disable_notification=True)
 
 if __name__ == '__main__':
     loop.create_task(periodic(5))
