@@ -1,5 +1,6 @@
 import mysql.connector
-
+import datetime as dt
+from services.vk_api import get_vk_status
 db = mysql.connector.connect(
     host='localhost',
     user='root',
@@ -67,6 +68,35 @@ def get_users_tel_id():
     for i in cursor.fetchall():
         yield i[0]
 
+'''
+брать текущее время и сравнивать с стартом и концом в бд,
+запрашивать гет_статус вк и если пользователь онлайн добавлять время в сети вк
+'''
+
+def update_vk_time(vk_login):
+    sql=cursor.execute('UPDATE tlg_bot_user SET time_in_vk=time_in_vk+4 WHERE vk_id={}'.format(vk_login))
+
+
+
+
+
+
+def update_vk_db_times():
+    data=get_vk_track_info()
+    time_now = dt.datetime.now().strftime('%H:%M')
+    for user in data:
+        if time_now > data['start_time']and data['end_time']>time_now and get_vk_status(data['vk_id'])==1:
+            pass
+
+
+
+
+
+def get_vk_track_info():
+    cursor.execute('SELECT vk_id,start_time,end_time FROM tlg_bot_user')
+    row = cursor.fetchall()
+    l=[{'vk_id':item[0],'start_time':item[1],'end_time':item[2]} for item in row]
+    return l
 
 
 
@@ -84,3 +114,4 @@ async def get_user_info(tel_id):
         return None
 
 show_users()
+update_vk_time('Dcgtd')
