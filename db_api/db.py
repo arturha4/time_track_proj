@@ -68,7 +68,7 @@ def show_users():
     cursor.execute("SELECT * FROM tlg_bot_user")
     row=cursor.fetchall()
     for data in row:
-        print(data)
+        yield data
 
 
 def delete_all_users():
@@ -102,15 +102,11 @@ def add_vk_time(vk_login):
         db.commit()
 
 
-
-
-
-
-def update_vk_db_times():
-    data=get_vk_track_info()
+async def update_vk_db_times():
+    data = get_vk_track_info()
     time_now = dt.datetime.now().strftime('%H:%M')
     for user in data:
-        if time_now > user['start_time']and user['end_time']>time_now and get_vk_status(user['vk_id'])==1:
+        if time_now > user['start_time'] and user['end_time'] > time_now and get_vk_status(user['vk_id']) == 1:
             add_vk_time(user['vk_id'])
 
 
