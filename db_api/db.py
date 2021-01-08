@@ -15,10 +15,27 @@ cursor = db.cursor()
 #cursor.execute("CREATE TABLE tlg_bot_user (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,"
 #"start_time VARCHAR(5),end_time VARCHAR(5), urfu_login VARCHAR (40),urfu_password VARCHAR(30), github_login VARCHAR(39))")
 
-l={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'asd',
+l1={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'yaarturvsemsalam',
 'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
 'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+
+l2={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'kkosmos1la',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+
+l3={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'horkworse',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+
+l4={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'id228121715',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+
+
 
 
 def show_databases():
@@ -39,6 +56,7 @@ def create_user(data,tlg_chat_id):
                   data['urfu_password'], data['github_login'])
         cursor.execute(sql, values)
         db.commit()
+
     except Exception as e:
         return (f"Ошибка{e}")
 
@@ -73,8 +91,15 @@ def get_users_tel_id():
 запрашивать гет_статус вк и если пользователь онлайн добавлять время в сети вк
 '''
 
-def update_vk_time(vk_login):
-    sql=cursor.execute('UPDATE tlg_bot_user SET time_in_vk=time_in_vk+4 WHERE vk_id={}'.format(vk_login))
+def add_vk_time(vk_login):
+    try:
+        sql="UPDATE tlg_bot_user SET time_in_vk=time_in_vk+5 WHERE vk_id='{}'".format(vk_login)
+        data=(vk_login)
+        cursor.execute(sql,data)
+    except Exception as e:
+        print(e)
+    finally:
+        db.commit()
 
 
 
@@ -85,8 +110,8 @@ def update_vk_db_times():
     data=get_vk_track_info()
     time_now = dt.datetime.now().strftime('%H:%M')
     for user in data:
-        if time_now > data['start_time']and data['end_time']>time_now and get_vk_status(data['vk_id'])==1:
-            pass
+        if time_now > user['start_time']and user['end_time']>time_now and get_vk_status(user['vk_id'])==1:
+            add_vk_time(user['vk_id'])
 
 
 
@@ -113,5 +138,5 @@ async def get_user_info(tel_id):
     except:
         return None
 
-show_users()
-update_vk_time('Dcgtd')
+
+
