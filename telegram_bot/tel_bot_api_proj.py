@@ -1,6 +1,5 @@
 import logging
 import asyncio
-from datetime import datetime
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from db_api import db
@@ -110,12 +109,12 @@ async def take_github_login(message: types.Message, state: FSMContext):
 @dp.message_handler(Command('selecttime'), state=Test.DEFAULT)
 async def select_track_time(message: types.Message, state: FSMContext):
     await Test.SET_START_TIME.set()
-    await message.answer("Выбери начало трекинга!", reply_markup=inline.time_kb)
+    await message.answer("Выбери начало трекинга!", reply_markup=inline.time1_kb)
 
 
 @dp.message_handler(state=Test.SET_START_TIME)
 async def select_start_track_time(message: types.Message, state: FSMContext):
-    await message.answer("Теперь выбери конец трекинга!", reply_markup=inline.time_kb)
+    await message.answer("Теперь выбери конец трекинга!", reply_markup=inline.time1_kb)
     async with state.proxy() as data:
         data['start_time'] = message.text
     await Test.SET_END_TIME.set()
@@ -181,6 +180,10 @@ async def login_vk(call: types.CallbackQuery):
     await Test.TAKE_VK_ID.set()
 
 
+async def send_test(chat_id='sdsd'):
+    await bot.send_message('766109265','Test passed!')
+
+
 @dp.callback_query_handler(text_contains='github', state=Test.SET_SERVICE)
 async def set_github(call: types.CallbackQuery, state=FSMContext):
     await bot.send_message(chat_id=call.from_user.id, text='Введи свой логин или ник в github')
@@ -190,8 +193,9 @@ async def set_github(call: types.CallbackQuery, state=FSMContext):
 async def periodic(sleep_for):
     while True:
         await asyncio.sleep(sleep_for)
-        await db.update_vk_db_times()
+        await db.update_db(send_test)
 
 if __name__ == '__main__':
-    loop.create_task(periodic(900))
+    loop.create_task(periodic(5))
     executor.start_polling(dp, skip_updates=True,timeout=None)
+

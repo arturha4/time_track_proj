@@ -1,5 +1,8 @@
+import asyncio
+
 import mysql.connector
 import datetime as dt
+
 from services.vk_api import get_vk_status
 db = mysql.connector.connect(
     host='localhost',
@@ -18,22 +21,52 @@ cursor = db.cursor()
 l1={'vk_selected':True,'github_selected': True,
 'urfu_selected':True, 'vk_login':'yaarturvsemsalam',
 'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
 
 l2={'vk_selected':True,'github_selected': True,
 'urfu_selected':True, 'vk_login':'kkosmos1la',
 'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
 
 l3={'vk_selected':True,'github_selected': True,
 'urfu_selected':True, 'vk_login':'horkworse',
 'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
 
 l4={'vk_selected':True,'github_selected': True,
 'urfu_selected':True, 'vk_login':'id228121715',
 'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '10:45','end_time': '22:30'}
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
+
+l5={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'id228121715',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
+
+l6={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'igasshik',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:45','end_time': '13:00'}
+
+l7={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'igasshik',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
+
+l8={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'id228121715',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
+
+l9={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'id228121715',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
+
+l10={'vk_selected':True,'github_selected': True,
+'urfu_selected':True, 'vk_login':'id228121715',
+'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
+'github_login':'sfgfd','start_time': '12:50','end_time': '12:53'}
 
 
 
@@ -56,7 +89,6 @@ def create_user(data,tlg_chat_id):
                   data['urfu_password'], data['github_login'])
         cursor.execute(sql, values)
         db.commit()
-
     except Exception as e:
         return (f"Ошибка{e}")
 
@@ -102,12 +134,18 @@ def add_vk_time(vk_login):
         db.commit()
 
 
-async def update_vk_db_times():
+async def update_db(func):
     data = get_vk_track_info()
-    time_now = dt.datetime.now().strftime('%H:%M')
+    dt_time_now = dt.datetime.now()
+    str_time_now=dt_time_now.strftime('%H:%M')
+    border=dt.datetime(2020, 12, 20, 23, 59, 0).strftime('%H:%M')
+    delta= dt.timedelta(seconds=6)
     for user in data:
-        if time_now > user['start_time'] and user['end_time'] > time_now and get_vk_status(user['vk_id']) == 1:
+        dt_end_time = dt.datetime.strptime(user['end_time'], '%H:%M')
+        if str_time_now > user['start_time'] and user['end_time'] > str_time_now and get_vk_status(user['vk_id']) == 1:
             add_vk_time(user['vk_id'])
+        if dt.datetime.now().strftime('%H:%M')=='18:04':
+            await func(user['vk_id'])
 
 
 
@@ -135,4 +173,4 @@ async def get_user_info(tel_id):
         return None
 
 
-
+print(*show_users())

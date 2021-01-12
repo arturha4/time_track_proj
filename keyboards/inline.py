@@ -21,13 +21,13 @@ inline_vk_kb = InlineKeyboardMarkup().add(vk_btn)
 inline_urfu_kb = InlineKeyboardMarkup().add(urfu_btn)
 
 
-time_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+time1_kb=ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 
-for i in range(0, 24):
+for i in range(6, 24):
     hour = f'0{i}' if i < 10 else i
-    time_kb.insert(f'{hour}:00')
+    time1_kb.insert(f'{hour}:00')
     for j in range(15, 46, 15):
-        time_kb.insert(f'{hour}:{j}')
+        time1_kb.insert(f'{hour}:{j}')
 
 
 async def get_choosed_keyboard(state: FSMContext):
