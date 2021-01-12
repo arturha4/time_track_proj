@@ -13,63 +13,6 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 
 
-#cursor.execute("CREATE DATABASE ApiProject")
-#cursor.execute("CREATE TABLE tlg_bot_user (telegram_id VARCHAR(50) UNIQUE , vk_id VARCHAR(30),time_in_vk SMALLINT,"
-#"start_time VARCHAR(5),end_time VARCHAR(5), urfu_login VARCHAR (40),urfu_password VARCHAR(30), github_login VARCHAR(39))")
-
-l1={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'yaarturvsemsalam',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '02:15','end_time': '02:30'}
-
-l2={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'kkosmos1la',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '02:15','end_time': '02:45'}
-
-l3={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'horkworse',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '15:15','end_time': '17:45'}
-
-l4={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'id228121715',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '02:15','end_time': '02:30'}
-
-l5={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'id228121715',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '13:45','end_time': '17:45'}
-
-l6={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'igasshik',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '14:00','end_time': '17:45'}
-
-l7={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'igasshik',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '02:15','end_time': '02:30'}
-
-l8={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'id228121715',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '14:00','end_time': '17:00'}
-
-l9={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'id228121715',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '14:00','end_time': '17:45'}
-
-l10={'vk_selected':True,'github_selected': True,
-'urfu_selected':True, 'vk_login':'id228121715',
-'urfu_login':'sadbooys.2001@gmail.com', 'urfu_password':'Arturka_2001',
-'github_login':'sfgfd','start_time': '02:15','end_time': '02:45'}
-
-
-
-
 def show_databases():
     cursor.execute("SHOW DATABASES")
     for x in cursor:
@@ -171,23 +114,4 @@ async def get_user_info(tel_id):
     except:
         return None
 
-# print(*show_users())
-# create_user(l1,'12233')
-# create_user(l2,'123312')
-# create_user(l3,'1232342')
-# create_user(l4,'1232343')
-# create_user(l5,'122223')
-# create_user(l6,'123432')
-# create_user(l7,'123334234')
-# create_user(l8,'1232342')
-# create_user(l9,'1232443')
-# create_user(l10,'125423')
-#
-#
-# print(*show_users())
-
-
-print(dt.datetime.strptime('14:30','%H:%M')<dt.datetime(1900, 1, 1,23, 30, 0))
-print(dt.datetime(2020, 12, 20, 23, 59, 0).strftime('%H:%M'))
-print(dt.datetime.now().strftime('%H:%M')<(dt.datetime.strptime('18:45','%H:%M')+dt.timedelta(minutes=5)).strftime('%H:%M'))#вот где кроется ошибка
 
