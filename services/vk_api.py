@@ -1,5 +1,6 @@
 import vk
-vk_token = "46e50d8c46e50d8c46e50d8c8a46917fc2446e546e50d8c196fd185478ce57d33254a43"
+from telegram_bot import config
+vk_token = config.vk_tkn
 session = vk.Session()
 vk_api = vk.API(session)
 

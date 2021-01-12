@@ -1,0 +1,3 @@
+tlg_token = '1433832216:AAEcUK8VC2YLJcbG_6rCndbNBt_4DWe8L28'
+vk_tkn="46e50d8c46e50d8c46e50d8c8a46917fc2446e546e50d8c196fd185478ce57d33254a43"
+db_password='ghghrfth'

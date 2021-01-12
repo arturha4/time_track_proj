@@ -1,3 +1,4 @@
+import datetime
 import logging
 import asyncio
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -7,12 +8,12 @@ from aiogram import Bot, Dispatcher, executor, types
 from keyboards import inline
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
-from telegram_bot.settings_cofiguration import token
+from telegram_bot.config import tlg_token
 from services.istudent_api import login
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=token)
+bot = Bot(token=tlg_token)
 dp = Dispatcher(bot, storage=MemoryStorage())
 loop = asyncio.get_event_loop()
 
@@ -180,8 +181,8 @@ async def login_vk(call: types.CallbackQuery):
     await Test.TAKE_VK_ID.set()
 
 
-async def send_test(chat_id='sdsd'):
-    await bot.send_message('766109265','Test passed!')
+async def send_test(tel_chat_id):
+    await bot.send_message(chat_id=tel_chat_id,text=f'Test passed!')
 
 
 @dp.callback_query_handler(text_contains='github', state=Test.SET_SERVICE)
@@ -196,5 +197,7 @@ async def periodic(sleep_for):
         await db.update_db(send_test)
 
 if __name__ == '__main__':
-    loop.create_task(periodic(5))
+    loop.create_task(periodic(900))
     executor.start_polling(dp, skip_updates=True,timeout=None)
+
+
