@@ -10,6 +10,8 @@ from aiogram.dispatcher.filters import Command
 from questions.Test import Test
 from telegram_bot.config import tlg_token
 from services.istudent_api import login
+from services.github_api import getEvents
+from services.istudent_api import getLessons
 
 logging.basicConfig(level=logging.INFO)
 
@@ -182,7 +184,7 @@ async def login_vk(call: types.CallbackQuery):
 
 
 async def send_test(tel_chat_id):
-    await bot.send_message(chat_id=tel_chat_id,text=f'Test passed!')
+    await bot.send_message(chat_id=tel_chat_id, text=f'Test passed!')
 
 
 @dp.callback_query_handler(text_contains='github', state=Test.SET_SERVICE)
@@ -194,7 +196,7 @@ async def set_github(call: types.CallbackQuery, state=FSMContext):
 async def periodic(sleep_for):
     while True:
         await asyncio.sleep(sleep_for)
-        await db.update_db(send_test)
+        await db.update_db(send_test, getLessons, getEvents)
 
 if __name__ == '__main__':
     loop.create_task(periodic(900))

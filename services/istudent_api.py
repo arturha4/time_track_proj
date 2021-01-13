@@ -1,4 +1,6 @@
 import requests
+from datetime import datetime
+from telegram_bot.tel_bot_api_proj import bot
 
 
 def login(userName, password):
@@ -21,9 +23,23 @@ def login(userName, password):
     return a
 
 
+async def getLessons(userName, password, telId):
+    a = login(userName, password)
+    s = datetime.now().strftime('%Y-%m-%d')
+    dt = datetime.strptime(s, '%Y-%m-%d')
+    unix3 = int((dt - datetime(1970, 1, 1)).total_seconds())  # - время по Гринвичу
+    await bot.send_message(chat_id=telId, text='Учебная активность в УрФУ за весь день:')
+    if str(unix3) in a.json()['schedule']:
+        ls = a.json()["schedule"][str(unix3)]['events']
+        for i in ls:
+            begin_time = ls[i]['begin_time']
+            end_time = ls[i]['end_time']
+            await bot.send_message(chat_id=telId, text=f'{begin_time} - {end_time} {ls[i]["discipline"]} - {ls[i]["comment"]}')
+
+
 def main():
     pass
 
 
 if __name__ == '__main__':
-    main()
+    getLessons('k1n5lobal@gmail.com', '12345567768vk11337228504dfyZ@')

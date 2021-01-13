@@ -20,8 +20,7 @@ inline_github_kb = InlineKeyboardMarkup().add(git_btn)
 inline_vk_kb = InlineKeyboardMarkup().add(vk_btn)
 inline_urfu_kb = InlineKeyboardMarkup().add(urfu_btn)
 
-
-time1_kb=ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+time1_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 
 for i in range(6, 24):
     hour = f'0{i}' if i < 10 else i
