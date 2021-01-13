@@ -30,15 +30,16 @@ def create_user(data,tlg_chat_id):
         values = (tlg_chat_id, data['vk_login'], 0, data['start_time'], data['end_time'], data['urfu_login'],
                   data['urfu_password'], data['github_login'])
         cursor.execute(sql, values)
-        db.commit()
     except Exception as e:
         return (f"Ошибка{e}")
+    finally:
+        db.commit()
 
 
 
 
 
-def show_users():
+def get_users_data():
     cursor.execute("SELECT * FROM tlg_bot_user")
     row=cursor.fetchall()
     for data in row:
@@ -77,16 +78,15 @@ def add_vk_time(vk_login):
 
 
 async def update_db(func):
-    data = get_vk_track_info()
-    dt_time_now = dt.datetime.now()
-    str_time_now=dt_time_now.strftime('%H:%M')
-    border=dt.datetime(2020, 12, 20, 23, 59, 0).strftime('%H:%M')
+    data =  get_vk_track_info()
+    str_time_now=dt.datetime.now().strftime('%H:%M')
     delta= dt.timedelta(minutes=6)
     for user in data:
-        dt_end_time = dt.datetime.strptime(user['end_time'], '%H:%M')
-        if str_time_now > user['start_time'] and user['end_time'] > str_time_now and get_vk_status(user['vk_id']) == 1:
+        user_end_time=user['end_time']
+        dt_end_time = dt.datetime.strptime(user_end_time, '%H:%M')
+        if str_time_now > user['start_time'] and user_end_time > str_time_now and get_vk_status(user['vk_id']) == 1:
             add_vk_time(user['vk_id'])
-        if str_time_now>=user['end_time'] and str_time_now<=(dt_end_time+delta).strftime('%H:%M'):
+        if str_time_now>=user_end_time and str_time_now<=(dt_end_time+delta).strftime('%H:%M'):
             await func(user['telegram_id'])
 
 
@@ -96,7 +96,7 @@ async def update_db(func):
 def get_vk_track_info():
     cursor.execute('SELECT vk_id,start_time,end_time,telegram_id FROM tlg_bot_user')
     row = cursor.fetchall()
-    l=[{'vk_id':item[0],'start_time':item[1],'end_time':item[2],'telegram_id':item[3]} for item in row]
+    l=[{'vk_id':item[0],'start_time':item[1],'end_time':item[2],'telegram_id':item[3]} for item in row if item[0]!='0']
     return l
 
 
@@ -113,5 +113,3 @@ async def get_user_info(tel_id):
         return d
     except:
         return None
-
-
