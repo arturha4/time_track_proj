@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from db_api import db
 from aiogram import Bot, Dispatcher, executor, types
-from keyboards import inline
+from keyboards import telegram_keyboards
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
 from telegram_bot.config import tlg_token
@@ -39,21 +39,21 @@ async def help_message(message: types.Message):
 
 
 @dp.message_handler(Command('auth'), state=Test.DEFAULT)
-async def auth(message: types.Message):
-    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=inline.inline_kb1)
+async def set_service(message: types.Message):
+    await message.answer('Выбери сервисы, которые ты хочешь отслеживать', reply_markup=telegram_keyboards.inline_kb1)
     await Test.SET_SERVICE.set()
 
 
 @dp.message_handler(Command('nextstep'), state=Test.DEFAULT)
 async def next_auth(message: types.Message, state: FSMContext):
-    if await inline.get_choosed_keyboard(state) is None:
+    if await telegram_keyboards.get_choosed_keyboard(state) is None:
         # await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
         # await Test.SET_SERVICE.set()
         await  message.answer('Сервисы закончились, нажми /selecttime\n'
                               'и ты перейдёшь к выбору времени')
         await Test.DEFAULT.set()
     else:
-        await message.answer('Оставшиеся сервисы:', reply_markup=await inline.get_choosed_keyboard(state))
+        await message.answer('Оставшиеся сервисы:', reply_markup=await telegram_keyboards.get_choosed_keyboard(state))
         await Test.SET_SERVICE.set()
 
 
@@ -62,7 +62,7 @@ async def next_auth(message: types.Message, state: FSMContext):
 async def verify_vk_auth(message: types.Message, state: FSMContext):
     await state.update_data(vk_login=message.text)
     await message.answer(text=f'Твоя страница?\n'
-                              f'https://vk.com/{message.text}', reply_markup=inline.inline_vk_yes_no_kb)
+                              f'https://vk.com/{message.text}', reply_markup=telegram_keyboards.inline_vk_yes_no_kb)
     await Test.VK_YES.set()
 
 
@@ -81,7 +81,7 @@ async def take_urfu_password(message: types.Message, state: FSMContext):
     if login(all_data.get('urfu_login'), all_data.get('urfu_password')) == -1:
         async with state.proxy() as data:
             data['urfu_selected'] = False
-        await bot.send_message(chat_id=message.from_user.id, reply_markup=await inline.get_choosed_keyboard(state),
+        await bot.send_message(chat_id=message.from_user.id, reply_markup=await telegram_keyboards.get_choosed_keyboard(state),
                                text='Неправильно введен логин или пароль, попробуйте еще раз')
         await Test.SET_SERVICE.set()
     else:
@@ -110,12 +110,12 @@ async def take_github_login(message: types.Message, state: FSMContext):
 @dp.message_handler(Command('selecttime'), state=Test.DEFAULT)
 async def select_track_time(message: types.Message, state: FSMContext):
     await Test.SET_START_TIME.set()
-    await message.answer("Выбери начало трекинга!", reply_markup=inline.time1_kb)
+    await message.answer("Выбери начало трекинга!", reply_markup=telegram_keyboards.time1_kb)
 
 
 @dp.message_handler(state=Test.SET_START_TIME)
 async def select_start_track_time(message: types.Message, state: FSMContext):
-    await message.answer("Теперь выбери конец трекинга!", reply_markup=inline.time1_kb)
+    await message.answer("Теперь выбери конец трекинга!", reply_markup=telegram_keyboards.time1_kb)
     async with state.proxy() as data:
         data['start_time'] = message.text
     await Test.SET_END_TIME.set()
@@ -132,7 +132,7 @@ async def add_info_to_dict(data:FSMContext.get_data):
 
 
 @dp.message_handler(state=Test.SET_END_TIME)
-async def reg_end(message: types.Message, state: FSMContext):
+async def registration_end(message: types.Message, state: FSMContext):
     await message.answer("Отлично теперь мы можем\n"
                          "отслеживать твою активность")
     data=await state.get_data()
