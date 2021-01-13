@@ -112,3 +112,5 @@ async def get_user_info(tel_id):
         return d
     except:
         return None
+
+delete_all_users()

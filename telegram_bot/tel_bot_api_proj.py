@@ -77,7 +77,7 @@ async def take_urfu_login(message: types.Message, state: FSMContext):
 async def take_urfu_password(message: types.Message, state: FSMContext):
     await state.update_data(urfu_password=message.text)
     all_data = await state.get_data()
-    if login(all_data.get('urfu_login'), all_data.get('urfu_password')) == -1:
+    if services.istudent_api.login(all_data.get('urfu_login'), all_data.get('urfu_password')) == -1:
         async with state.proxy() as data:
             data['urfu_selected'] = False
         await bot.send_message(chat_id=message.from_user.id, reply_markup=await telegram_keyboards.get_choosed_keyboard(state),
