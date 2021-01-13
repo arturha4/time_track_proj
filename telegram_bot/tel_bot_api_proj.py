@@ -3,7 +3,7 @@ import logging
 import asyncio
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from db_api import db
+from mysql_db import db
 from aiogram import Bot, Dispatcher, executor, types
 from keyboards import telegram_keyboards
 from aiogram.dispatcher.filters import Command
