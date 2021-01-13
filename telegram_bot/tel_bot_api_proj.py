@@ -1,4 +1,4 @@
-import datetime
+import services
 import logging
 import asyncio
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -9,9 +9,6 @@ from keyboards import telegram_keyboards
 from aiogram.dispatcher.filters import Command
 from questions.Test import Test
 from telegram_bot.config import tlg_token
-from services.istudent_api import login
-from services.github_api import getEvents
-from services.istudent_api import getLessons
 
 logging.basicConfig(level=logging.INFO)
 
@@ -196,7 +193,7 @@ async def set_github(call: types.CallbackQuery, state=FSMContext):
 async def periodic(sleep_for):
     while True:
         await asyncio.sleep(sleep_for)
-        await db.update_db(send_test, getLessons, getEvents)
+        await db.update_db(send_test, services.istudent_api.getLessons, services.github_api.getEvents)
 
 if __name__ == '__main__':
     loop.create_task(periodic(900))
