@@ -80,25 +80,31 @@ def add_vk_time(vk_login):
 
 
 async def update_db(func, urfuStat, gitStat):
-    data = get_vk_track_info()
+    data = get_track_info()
     str_time_now = dt.datetime.now().strftime('%H:%M')
-    delta = dt.timedelta(minutes=6)
+    delta = dt.timedelta(minutes=5)
     for user in data:
         user_end_time = user['end_time']
         dt_end_time = dt.datetime.strptime(user_end_time, '%H:%M')
         if user['vk_id'] != 0 and user['start_time'] < str_time_now < user_end_time and get_vk_status(user['vk_id']) == 1:
             add_vk_time(user['vk_id'])
-        if user_end_time <= str_time_now <= (dt_end_time + delta).strftime('%H:%M'):
-            await func(user['telegram_id'])
+        if user_end_time <= str_time_now and str_time_now <= (dt_end_time + delta).strftime('%H:%M'):
+            await func(user['telegram_id'],str(user['time_in_vk']))
             await urfuStat(user['urfu_login'], user['urfu_password'], user['telegram_id'])
             await gitStat(user['github_login'], user['telegram_id'])
 
-def get_vk_track_info():
-    cursor.execute('SELECT vk_id,start_time,end_time,telegram_id,urfu_login,urfu_password,github_login FROM tlg_bot_user')
+def get_track_info():
+    cursor.execute('SELECT vk_id,start_time,end_time,telegram_id,urfu_login,urfu_password,github_login,time_in_vk FROM tlg_bot_user')
     row = cursor.fetchall()
-    l = [{'vk_id': item[0], 'start_time': item[1], 'end_time': item[2], 'telegram_id': item[3], 'urfu_login': item[4], 'urfu_password': item[5], 'github_login': item[6]} for item in row]
+    l = [{'vk_id': item[0],
+          'start_time': item[1],
+          'end_time': item[2],
+          'telegram_id': item[3],
+          'urfu_login': item[4],
+          'urfu_password': item[5],
+          'github_login': item[6],
+          'time_in_vk':item[7]} for item in row]
     return l
-
 
 async def get_user_info(tel_id):
     try:
@@ -113,4 +119,3 @@ async def get_user_info(tel_id):
     except:
         return None
 
-delete_all_users()

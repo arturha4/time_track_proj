@@ -1,4 +1,5 @@
-import services
+import services.istudent_api as urfu
+import services.github_api
 import logging
 import asyncio
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -77,7 +78,7 @@ async def take_urfu_login(message: types.Message, state: FSMContext):
 async def take_urfu_password(message: types.Message, state: FSMContext):
     await state.update_data(urfu_password=message.text)
     all_data = await state.get_data()
-    if services.istudent_api.login(all_data.get('urfu_login'), all_data.get('urfu_password')) == -1:
+    if urfu.login(all_data.get('urfu_login'), all_data.get('urfu_password')) == -1:
         async with state.proxy() as data:
             data['urfu_selected'] = False
         await bot.send_message(chat_id=message.from_user.id, reply_markup=await telegram_keyboards.get_choosed_keyboard(state),
@@ -180,8 +181,8 @@ async def login_vk(call: types.CallbackQuery):
     await Test.TAKE_VK_ID.set()
 
 
-async def send_test(tel_chat_id):
-    await bot.send_message(chat_id=tel_chat_id, text=f'Test passed!')
+async def send_test(tel_chat_id,time_in_vk):
+    await bot.send_message(chat_id=tel_chat_id, text=f'{time_in_vk} минут проведено в  вк')
 
 
 @dp.callback_query_handler(text_contains='github', state=Test.SET_SERVICE)

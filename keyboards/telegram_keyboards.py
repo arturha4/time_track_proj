@@ -44,5 +44,7 @@ async def get_choosed_keyboard(state: FSMContext):
         return inline_urfu_kb
     if not vk and github and urfu:
         return inline_vk_kb
+    if not urfu and not github and not vk:
+        return inline_kb1
     else:
         return None
