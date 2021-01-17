@@ -13,4 +13,6 @@ class Test(StatesGroup):
     DEFAULT = State()
     SET_START_TIME = State()
     SET_END_TIME = State()
+    CHANGE_TIME=State()
+    CHANGE_TIME_FINAL=State()
     REGISTERED = State()

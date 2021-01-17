@@ -30,12 +30,41 @@ async def start_message(message: types.Message, state=FSMContext):
         await message.answer('Вы уже зарегистриованы')
 
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['change_time'],state=Test.REGISTERED)
+async def change_time(message:types.message,state:FSMContext):
+    await message.answer("Выбери начало трекинга!", reply_markup=telegram_keyboards.time1_kb)
+    await Test.CHANGE_TIME.set()
+
+
+@dp.message_handler(state=Test.CHANGE_TIME)
+async def change_start_time(message:types.message,state:FSMContext):
+    async with state.proxy() as data:
+        data['start_time'] = message.text
+    await message.answer("Теперь выбери конец трекинга!", reply_markup=telegram_keyboards.time1_kb)
+    await Test.CHANGE_TIME_FINAL.set()
+
+
+@dp.message_handler(state=Test.CHANGE_TIME_FINAL)
+async def change_end_time(message:types.message,state:FSMContext):
+    async with state.proxy() as data:
+        data['end_time'] = message.text
+    all_data=await state.get_data()
+    await db.change_time(all_data.get('start_time'),all_data.get('end_time'),message.chat.id)
+    await message.answer(f"""
+        Твой логин вк: {all_data.get("vk_login")}
+        Твой логин урфу: {all_data.get("urfu_login")}
+        Твой логин гитхаб: {all_data.get("github_login")}
+        Время старта: {all_data.get("start_time")}
+        Время окончания: {all_data.get("end_time")}
+                                 """)
+    await Test.REGISTERED.set()
+
+@dp.message_handler(commands=['help'],state='*')
 async def help_message(message: types.Message):
     await message.answer(
-        "Список команд:\n/auth - авторизация в сервисах \n"
-        "/starttime - назначить/изменить время начала трекинга\n"
-        "/endtime - назначить/изменить время конца трекинга")
+        "Список команд:\n"
+        "/change_time - назначить/изменить время начала трекинга\n"
+        "")
 
 
 @dp.message_handler(Command('auth'), state=Test.DEFAULT)
@@ -197,6 +226,7 @@ async def periodic(sleep_for):
         await db.update_db(send_test, services.istudent_api.getLessons, services.github_api.getEvents)
 
 if __name__ == '__main__':
+    db.delete_all_users()
     loop.create_task(periodic(900))
     executor.start_polling(dp, skip_updates=True,timeout=None)
 

@@ -1,3 +1,5 @@
+import asyncio
+
 from telegram_bot.config import db_password
 import mysql.connector
 import datetime as dt
@@ -79,6 +81,17 @@ def add_vk_time(vk_login):
         db.commit()
 
 
+async def change_time(start_time1,end_time1,tel_id):
+    try:
+        sql=('UPDATE tlg_bot_user SET start_time=%s,end_time=%s WHERE telegram_id=%s')
+        data=(start_time1,end_time1,tel_id)
+        cursor.execute(sql,data)
+    except Exception as e:
+        print(e)
+    finally:
+        db.commit()
+
+
 async def update_db(func, urfuStat, gitStat):
     data = get_track_info()
     str_time_now = dt.datetime.now().strftime('%H:%M')
@@ -119,3 +132,5 @@ async def get_user_info(tel_id):
     except:
         return None
 
+
+print(*get_users_data())
